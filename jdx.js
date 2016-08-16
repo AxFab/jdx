@@ -73,7 +73,7 @@
         reg: /^([0-9]{1,2}):([0-9]{2}):([0-9]{2})\s+([aApP][mM])$/,
         hours: 1, mins: 2, secs:3, TT:4 },
       longTime: {
-        reg: /^([0-9]{1,2}):([0-9]{2}):([0-9]{2})\s+([aApP][mM])\s+GMT([+-][0-9]{4})$/,
+        reg: /^([0-9]{1,2}):([0-9]{2}):([0-9]{2})\s+([aApP][mM])\s+(GMT[+-][0-9]{4})$/,
         hours: 1, mins: 2, secs:3, TT:4, gmt:5 },
       isoDate: {
         reg: /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/,
@@ -181,9 +181,48 @@
         res = new Date(),
         tzOff = -now.getTimezoneOffset(),
 
-    model = dF.model[model] || null;
-    if (model == null)
-      return NaN; // TODO -- Recreate regexp from the pattern...
+    model = dF.model[model] || model;
+    if (typeof model === 'string') {
+      var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
+          regexps = {
+            d:    { r:'[1-3]?[0-9]', t:'day'},
+            dd:   { r:'[0-3][0-9]', t:'day'},
+            ddd:  { r:'[A-Za-z]+'},
+            dddd: { r:'[A-Za-z]+'},
+            m:    { r:'1?[0-9]', t:'month'},
+            mm:   { r:'[0-1][0-9]', t:'month'},
+            mmm:  { r:'[A-Za-z]+', t:'month'},
+            mmmm: { r:'[A-Za-z]+', t:'month'},
+            yy:   { r:'[0-9]{2}', t:'year'},
+            yyyy: { r:'[0-9]{4}', t:'year'},
+            h:    { r:'1?[0-9]', t:'hours'},
+            hh:   { r:'[0-1][0-9]', t:'hours'},
+            H:    { r:'[1-2]?[0-9]', t:'hours'},
+            HH:   { r:'[0-2][0-9]', t:'hours'},
+            M:    { r:'[1-5]?[0-9]', t:'mins'},
+            MM:   { r:'[0-5][0-9]', t:'mins'},
+            s:    { r:'[1-5]?[0-9]', t:'secs'},
+            ss:   { r:'[0-5][0-9]', t:'secs'},
+            l:    { r:'[0-9]{3}', t:'ms'},
+            L:    { r:'[0-9]{2}', t:'ms'},
+            t:    { r:'[ap]', t:'TT'},
+            tt:   { r:'[ap]m', t:'TT'},
+            T:    { r:'[AP]', t:'TT'},
+            TT:   { r:'[AP]M', t:'TT'},
+            Z:    { r:'UTC|GMT[+-][0-9]{4}', t:'gmt'},
+            o:    { r:'[+-][0-9]+', t:'gmt'},
+            S:    { r:'th|st|nd|rd'}
+          };
+
+      var keys = {}, idx = 0;
+      model = model.replace(token, function ($0) {
+        keys[regexps[$0].t] = (++idx);
+        return $0 in regexps ? '('+regexps[$0].r+')' : $0.slice(1, $0.length - 1);
+      });
+      keys.reg = new RegExp(model);
+      model = keys;
+      // return NaN; // TODO -- Check validity!!
+    }
 
     var m = date.match(model.reg);
     if (m.length <= 1)
@@ -191,9 +230,9 @@
 
     var tzHour = tzOff / 60, tzMin = tzOff % 60;
     var gmHour = 0, gmMin = 0;
-    if (model.gmt) {
-      gmHour = parseInt(m[model.gmt].substr(0, 3))
-      gmMin = parseInt(m[model.gmt].substr(3)) * (gmHour / Math.abs(gmHour));
+    if (model.gmt && m[model.gmt].substr(0,3) === 'GMT') {
+      gmHour = parseInt(m[model.gmt].substr(3, 3))
+      gmMin = parseInt(m[model.gmt].substr(6)) * (gmHour / Math.abs(gmHour));
     }
 
     if (model.hours) {
@@ -217,6 +256,8 @@
 
     if (model.secs) {
       res.setSeconds(parseInt(m[model.secs]));
+    } else {
+      res.setSeconds(0);
     }
 
 

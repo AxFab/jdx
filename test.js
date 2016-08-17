@@ -12,10 +12,12 @@
       return 'success';
     },
     failure: function (name, result, expected) {
-      console.log (' - ' + name + ': ' + result + ' -> FAIL');
+      process.exitCode = 1;
+      console.log (' - ' + name + ': ' + result + ' -> FAIL ('+ expected+')');
       return 'warning';
     },
     error: function (name, exception) {
+      process.exitCode = 1;
       console.log (' - ' + name + ': ERR. - ' + exception.message);
       return 'danger';
     },
@@ -43,6 +45,7 @@
     'HH:MM Z':{prc:1000*60,mod:60*24,md:true},
   };
 
+  // jDx.setLang('es')
   for (var test in formatTests) {
     var info = formatTests[test], status;
     if (info === true)
@@ -72,3 +75,5 @@
   };
 
 }).call(this);
+
+

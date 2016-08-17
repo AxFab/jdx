@@ -47,7 +47,7 @@
       isoDateTime:    "yyyy-mm-dd'T'HH:MM:ss",
       isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
     },
-    model:{
+    models:{
       "default": {
         reg: /^[A-Za-z]+\s+([A-Za-z]+)\s+([0-9]{2})\s+([0-9]{4})\s+([0-9]{2}):([0-9]{2}):([0-9]{2})$/,
         day: 2, month: 1, year: 3, hours:4, mins:5, secs:6 },
@@ -181,7 +181,7 @@
         res = new Date(),
         tzOff = -now.getTimezoneOffset(),
 
-    model = dF.model[model] || model;
+    model = dF.models[model] || model || null;
     if (typeof model === 'string') {
       var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
           regexps = {
@@ -221,11 +221,34 @@
       });
       keys.reg = new RegExp(model);
       model = keys;
-      // return NaN; // TODO -- Check validity!!
+
+      if (idx == 0)
+        throw new SyntaxError('This is not a format for a date.');
+      if (typeof model.month !== typeof model.year)
+        throw new SyntaxError('A month need a year and vice-versa.');
+      if (model.day && typeof model.day !== typeof model.month)
+        throw new SyntaxError("A day can't be set without month.");
+      // if (model.mins && typeof model.mins !== typeof model.hours)
+      //   throw new SyntaxError("Minutes without hours doesn't make sense.");
+      if (model.secs && typeof model.secs !== typeof model.mins)
+        throw new SyntaxError("Seconds without minutes doesn't make sense.");
+      if (model.ms && typeof model.ms !== typeof model.secs)
+        throw new SyntaxError("Milliseconds without seconds doesn't make sense.");
     }
 
-    var m = date.match(model.reg);
-    if (m.length <= 1)
+    var m = null;
+    if (!model) {
+      for (var k in dF.models) {
+        model = dF.models[k];
+        m = date.match(model.reg);
+        if (m != null && m.length > 1) 
+          break;
+      }
+    } else {
+      m = date.match(model.reg);
+    }
+
+    if (m == null || m.length <= 1)
       return NaN;
 
     var tzHour = tzOff / 60, tzMin = tzOff % 60;

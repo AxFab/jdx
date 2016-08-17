@@ -1,0 +1,15 @@
+# Git ignore for JS code
+
+# Use file white-list and folder black-list
+*
+!*/
+
+# Add source file
+!*.js
+!*.json
+
+# Add repository files
+!*.md
+!.git*
+!LICENSE
+

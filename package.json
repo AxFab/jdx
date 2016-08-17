@@ -1,0 +1,24 @@
+{
+  "name": "jdx",
+  "version": "0.1.0",
+  "description": "Extension for JavaScript date (format and parse)",
+  "main": "jdx.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AxFab/jdx.git"
+  },
+  "keywords": [
+    "date",
+    "format",
+    "parse"
+  ],
+  "author": "Fabien Bavent <fabien.bavent@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AxFab/jdx/issues"
+  },
+  "homepage": "https://github.com/AxFab/jdx#readme"
+}

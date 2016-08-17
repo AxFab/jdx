@@ -25,7 +25,7 @@
       return '<div class="alert-' + status + '"><p><b>' + name + ':</b>' +
           result + '<em class="pull-right">' + expected + '</em></p></div>';
     }
-  }
+  };
 
   /* List basic tests */
   var formatTests = {
@@ -48,25 +48,29 @@
   // jDx.setLang('es')
   for (var test in formatTests) {
     var info = formatTests[test], status;
-    if (info === true)
+    if (info === true) {
       info = {
         prc:1000
       }
+    }
     var res, org, exd, a, 
-        b = parseInt(now.getTime() / info.prc), e;
-    if (info.mod)
+        b = parseInt(now.getTime() / info.prc);
+    if (info.mod) {
       b = b % info.mod;
+    }
     try {
       res = jDx.formatDate(now, test);
       org = info.md ? jDx.parseDate(res, test) : jDx.parseDate(res);
       exd = jDx.formatDate(org, 'isoUtcDateTime');
       a = !isNaN(org) ? parseInt(org.getTime() / info.prc) : 0;
-      if (info.mod)
+      if (info.mod) {
         a = a % info.mod;
-      if (a === b)
+      }
+      if (a === b) {
         status = UT.success(test, res, exd);
-      else
+      } else {
         status = UT.failure(test, res, exd);
+      }
     } catch (e) {
       status = UT.error(test, e);
     }

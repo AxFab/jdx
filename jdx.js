@@ -199,17 +199,16 @@
       TT:   H < 12 ? "AM" : "PM",
       Z:    utc ? "UTC" : gmt,
       o:    (o > 0 ? "-" : "+") + padWithZero(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
-      S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
+      S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 !== 10) * d % 10]
     };
-  }
+  };
 
   /** Create the parsing model for this date mask. */
   var createDateParsingModel = function (mask) {   
-    var regexps = datePartPatterns,
-        model = {}, 
+    var model = {}, 
         idx = 0;
 
-    if (mask.slice(0, 4) == "UTC:") {
+    if (mask.slice(0, 4) === "UTC:") {
       mask = mask.slice(4);
       model.utc = true;
     }
@@ -226,21 +225,22 @@
     mask = mask.replace(/\s+/g, "\\s+");
     model.reg = new RegExp('^\\s*' + mask + '\\s*$');
 
-    if (idx == 0)
+    if (idx === 0) {
       throw new SyntaxError('This is not a format for a date.');
-    else if (typeof model.month !== typeof model.year)
+    } else if (typeof model.month !== typeof model.year) {
       throw new SyntaxError('A month need a year and vice-versa.');
-    else if (model.day && typeof model.day !== typeof model.month)
+    } else if (model.day && typeof model.day !== typeof model.month) {
       throw new SyntaxError("A day can't be set without month.");
-    // else if (model.mins && typeof model.mins !== typeof model.hours)
+    // } else if (model.mins && typeof model.mins !== typeof model.hours) {
     //   throw new SyntaxError("Minutes without hours doesn't make sense.");
-    else if (model.secs && typeof model.secs !== typeof model.mins)
+    } else if (model.secs && typeof model.secs !== typeof model.mins) {
       throw new SyntaxError("Seconds without minutes doesn't make sense.");
-    else if (model.ms && typeof model.ms !== typeof model.secs)
+    } else if (model.ms && typeof model.ms !== typeof model.secs) {
       throw new SyntaxError("Milliseconds without seconds doesn't make sense.");
+    }
 
     return model;
-  }
+  };
 
   /** Set date-time from text. */
   var dateParsingSetter = {
@@ -263,14 +263,16 @@
     setMinutes: function (date, model, matching, config) {
       if (model.mins) {
         var dc = 0;
-        if (config.utc || model.utc) dc += config.tzMin;
-        else if (model.gmt) dc += config.gmMin - config.tzMin;
+        if (config.utc || model.utc) {
+          dc += config.tzMin;
+        } else if (model.gmt) {
+          dc += config.gmMin - config.tzMin;
+        }
         date.setMinutes(parseInt(matching[model.mins]) + dc);
       } else {
         date.setMinutes(0 - (config.utc || model.utc ? 0 : config.tzMin));
       }
-    },
-    setSeconds: function (date, model, matching, config) {
+
       if (model.secs) {
         date.setSeconds(parseInt(matching[model.secs]));
       } else {
@@ -280,16 +282,18 @@
     setDate: function (date, model, matching, config) {
       if (model.month) {
         var since = 0;
-        if (matching[model.year].length == 2)
+        if (matching[model.year].length === 2) {
           since = parseInt(config.year / 100) * 100;
+        }
         date.setYear(parseInt(matching[model.year]) + since);
       
         var mn = parseInt(matching[model.month]);
         if (isNaN(mn)) {
           var arr = dF.monthNames;
           for (mn = 0; mn< arr.length; ++mn) {
-            if (matching[model.month] === arr[mn])
+            if (matching[model.month] === arr[mn]) {
               break;
+            }
           }
           mn = (mn + 1) % 12;
         }
@@ -301,13 +305,15 @@
         date.setDate(day);
       }
     },
-  }
+  };
 
   /** Pad number with leading zero. */
   var padWithZero = function (val, len) {
-    val = String(val);
+    val = val.toString();
     len = len || 2;
-    while (val.length < len) val = "0" + val;
+    while (val.length < len) {
+      val = "0" + val;
+    }
     return val;
   };
 
@@ -315,7 +321,7 @@
 
   /** Format a date to string */ 
   jDx.formatDate = function (date, mask, utc) {
-    if (arguments.length == 1 && typeof(date) === 'string') {
+    if (arguments.length === 1 && typeof(date) === 'string') {
       mask = date;
       date = undefined;
     }
@@ -324,7 +330,7 @@
     date = date ? new Date(date) : new Date();
     if (isNaN(date)) {
       throw SyntaxError("invalid date");
-    } else if (mask.slice(0, 4) == "UTC:") {
+    } else if (mask.slice(0, 4) === "UTC:") {
       mask = mask.slice(4);
       utc = true;
     }
@@ -376,25 +382,24 @@
       year: now.getFullYear(),
     };
     if (model.gmt) {
-      config.gmHour = parseInt(matching[model.gmt].substr(3, 3))
+      config.gmHour = parseInt(matching[model.gmt].substr(3, 3));
       config.gmMin = parseInt(matching[model.gmt].substr(6)) * (config.gmHour / Math.abs(config.gmHour));
     }
 
     dateParsingSetter.setHours(res, model, matching, config);
     dateParsingSetter.setMinutes(res, model, matching, config);
-    dateParsingSetter.setSeconds(res, model, matching, config);
     dateParsingSetter.setDate(res, model, matching, config);
     return res;
   };
 
   /** Change of language and reset parsing model cache. */
   jDx.setLang = function (lang) {
-    dF = i18n[lang] || i18n['en'];
+    dF = i18n[lang] || i18n.en;
     dF.models = {};
     for (var k in dF.masks) {
       dF.models[k] = createDateParsingModel(dF.masks[k]);
     }
-  }
+  };
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 

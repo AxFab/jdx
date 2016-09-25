@@ -6,4 +6,4 @@ node_js:
 after_success: npm run coveralls
 addons:
   code_climate:
-repo_token: XJ3eFe84ta7QjRHioWrYApy7MogtDWJAv
+    repo_token: XJ3eFe84ta7QjRHioWrYApy7MogtDWJAv

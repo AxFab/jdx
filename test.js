@@ -1,13 +1,13 @@
-
+#!/usr/bin/env node
+'use strict';
 
 (function () {
-  var root = this;
 
   var jDx = require('./jdx.js'),
       now = new Date();
 
   var UT = {
-    success: function (name, result, expected) {
+    success: function (name, result) {
       console.log (' - ' + name + ': ' + result + ' -> OK');
       return 'success';
     },
@@ -45,13 +45,13 @@
     'HH:MM Z':{prc:1000*60,mod:60*24,md:true},
   };
 
-  // jDx.setLang('es')
+  jDx.setLang('en')
   for (var test in formatTests) {
     var info = formatTests[test], status;
     if (info === true) {
       info = {
         prc:1000
-      }
+      };
     }
     var res, org, exd, a, 
         b = parseInt(now.getTime() / info.prc);
@@ -78,6 +78,4 @@
     // $('#test_format').append(UT.toHtml(test, status, res, exd));
   };
 
-}).call(this);
-
-
+})();

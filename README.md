@@ -1,10 +1,20 @@
-# jdx
+# jDx
 
 Extension for JavaScript date (format and parse)
 
+[![Npm version](https://badge.fury.io/js/jdx.svg)](https://badge.fury.io/js/jdx)
+&nbsp; 
+[![Npm download](https://img.shields.io/npm/dm/jdx.svg)](https://www.npmjs.com/package/jdx)
+&nbsp; 
+[![Build Status](https://api.travis-ci.org/AxFab/jdx.svg?branch=master)](http://travis-ci.org/axfab/jdx)
+&nbsp; 
+[![Coverage Status](https://img.shields.io/coveralls/AxFab/jdx.svg)](https://coveralls.io/r/AxFab/jdx?branch=master)
+&nbsp; 
+[![Dependencies](https://david-dm.org/AxFab/jdx.svg)](https://david-dm.org/AxFab/jdx)
+
 ## Installation
 
-Jdx library have been tested on NodeJS and on most browser.
+__jDx__ library have been tested on NodeJS and on most browsers.
 
 On node:
 

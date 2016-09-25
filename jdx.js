@@ -217,7 +217,7 @@ var jDx = (function () {
     mask = mask.replace(datePartToken, function ($0) {
       if (datePartPatterns[$0]) {
         model[datePartPatterns[$0].t] = (++idx);
-        return '('+datePartPatterns[$0].r+')'
+        return '('+datePartPatterns[$0].r+')';
       }
       return $0.slice(1, $0.length - 1);
     });
@@ -300,7 +300,7 @@ var jDx = (function () {
       }
 
       if (model.day) {
-        var day = parseInt(matching[model.day])
+        var day = parseInt(matching[model.day]);
         date.setDate(day);
       }
     },

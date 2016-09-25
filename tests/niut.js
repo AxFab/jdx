@@ -28,7 +28,7 @@ var niut = (function () {
       ExecutionTrap.domain.exit();
       ExecutionTrap.domain = null;
     }
-  }
+  };
 
   var Assert = (function () {
 
@@ -47,7 +47,7 @@ var niut = (function () {
     };
 
     Assert.prototype.display = function(prefix) {
-      prefix = prefix || ''
+      prefix = prefix || '';
       var msgs = this.__statistics().messages;
       for (var i=0; i < msgs.length; ++i) {
         console.warn(prefix + msgs[i]);
@@ -55,7 +55,7 @@ var niut = (function () {
     };
 
     Assert.prototype.haveFailed = function() {
-      return this.__statistics().messages.length != 0;
+      return this.__statistics().messages.length !== 0;
     };
 
     Assert.prototype.fails = function(msg) {
@@ -74,22 +74,22 @@ var niut = (function () {
 
     Assert.prototype.isFalse = function(expr, msg) {
       msg = msg || 'Expects false, got "'+expr+'".';
-      this.isTrue(!expr, msg)
+      this.isTrue(!expr, msg);
     };
 
     Assert.prototype.isEquals = function(a, b, msg) {
       msg = msg || 'Expects "'+a+'" === "'+b+'".';
-      this.isTrue(a === b, msg)
+      this.isTrue(a === b, msg);
     };
 
     Assert.prototype.isNull = function(obj, msg) {
       msg = msg || 'Expects null, got "'+obj+'".';
-      this.isTrue(obj === null, msg)
+      this.isTrue(obj === null, msg);
     };
 
     Assert.prototype.isNotNull = function(obj, msg) {
       msg = msg || 'Expects not null, got "'+obj+'".';
-      this.isTrue(obj !== null && obj !== undefined, msg)
+      this.isTrue(obj !== null && obj !== undefined, msg);
     };
 
     Assert.prototype.willThrow = function(callback, msg) {
@@ -109,7 +109,7 @@ var niut = (function () {
 
     var TestSuite = function (name) {
       this.name = name;
-      this.tests = []
+      this.tests = [];
     };
 
     TestSuite.prototype.test = function (name, callback) 
@@ -167,17 +167,18 @@ var niut = (function () {
         var test = self.tests[idx++];
         if (test == null) {
           console.log ('');
-          result.ECHEC = (result.SUCCESS != result.TOTAL);
+          result.ECHEC = (result.SUCCESS !== result.TOTAL);
           return callback(result);
         }
         self.startTest(test.name, test.method, function (status, err) {
           result.TOTAL++;
           result[status]++;
           console.log ('  - ' + log[status] + test.name);
-          if (status === 'FAILED')
+          if (status === 'FAILED') {
             err.display('      ');
-          else if (status == 'ERROR')
+          } else if (status === 'ERROR') {
             console.log ('      ', err);
+          }
           next();
         });
       };

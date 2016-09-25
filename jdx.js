@@ -328,7 +328,7 @@ var jDx = (function () {
     mask = dF.masks[mask] || mask || dF.masks["default"];
     date = date ? new Date(date) : new Date();
     if (isNaN(date)) {
-      throw SyntaxError("invalid date");
+      throw SyntaxError("invalid date: '" + date + "'");
     } else if (mask.slice(0, 4) === "UTC:") {
       mask = mask.slice(4);
       utc = true;

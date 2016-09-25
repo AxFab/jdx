@@ -97,6 +97,15 @@ var testSuite = function (date, tz, lang) {
   };
 }
 
+
+suite.test('# UTC / GMT+0 issue', function (assert, done) {
+
+  var date = jDx.parseDate('3:41:06 PM GMT+0000');
+  assert.isFalse(isNaN(date));
+
+  done();
+});
+
 for (var t in timezones) {
   for (var d in dates) {
     for (var l in langs) {

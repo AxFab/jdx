@@ -381,8 +381,14 @@ var jDx = (function () {
       year: now.getFullYear(),
     };
     if (model.gmt) {
-      config.gmHour = parseInt(matching[model.gmt].substr(3, 3));
-      config.gmMin = parseInt(matching[model.gmt].substr(6)) * (config.gmHour / Math.abs(config.gmHour));
+      var gmtStr = matching[model.gmt];
+      if (gmtStr == 'UTC') {
+        config.gmHour = 0;
+        config.gmMin = 0;
+      } else {
+        config.gmHour = parseInt(gmtStr.substr(3, 3));
+        config.gmMin = parseInt(gmtStr.substr(3, 1) + gmtStr.substr(6));
+      }
     }
 
     dateParsingSetter.setHours(res, model, matching, config);

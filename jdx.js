@@ -25,8 +25,7 @@
 */
 "use strict";
 
-(function () {
-  var root = this;
+var jDx = (function () {
   
   var jDx = {};
 
@@ -124,7 +123,7 @@
     ]
   };
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   var datePartToken = 
     /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g;
@@ -317,7 +316,7 @@
     return val;
   };
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   /** Format a date to string */ 
   jDx.formatDate = function (date, mask, utc) {
@@ -399,17 +398,12 @@
     for (var k in dF.masks) {
       dF.models[k] = createDateParsingModel(dF.masks[k]);
     }
+    return jDx;
   };
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  return jDx.setLang('en');
+})();
 
-  jDx.setLang('en');
-
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = jDx; // Nodejs
-  } else {
-    root.jDx = jDx; // Browser
-  }
-
-}).call(this);
-
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = jDx; // Nodejs
+}

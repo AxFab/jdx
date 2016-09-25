@@ -4,7 +4,11 @@
   "description": "Extension for JavaScript date (format and parse)",
   "main": "jdx.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "coverage": "istanbul cover test.js",
+    "coveralls": "istanbul cover test.js && (cat ./coverage/lcov.info | coveralls)",
+    "minify": "uglifyjs -o jdx.min.js jdx.js",
+    "integrity": "cat jdx.min.js | openssl dgst -sha384 -binary | openssl enc -base64 -A"
   },
   "repository": {
     "type": "git",
@@ -15,6 +19,11 @@
     "format",
     "parse"
   ],
+  "devDependencies": {
+    "istanbul": "0.4.*",
+    "coveralls": "2.11.*",
+    "uglify-js": "2.7.*"
+  },
   "author": "Fabien Bavent <fabien.bavent@gmail.com>",
   "license": "MIT",
   "bugs": {

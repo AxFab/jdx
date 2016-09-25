@@ -3,22 +3,22 @@
   MIT License
   Copyright (C) 2016  Fabien Bavent
 
-  Permission is hereby granted, free of charge, to any person obtaining a 
-  copy of this software and associated documentation files (the "Software"), 
-  to deal in the Software without restriction, including without limitation 
-  the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-  and/or sell copies of the Software, and to permit persons to whom the 
+  Permission is hereby granted, free of charge, to any person obtaining a
+  copy of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation
+  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+  and/or sell copies of the Software, and to permit persons to whom the
   Software is furnished to do so, subject to the following conditions:
 
-  The above copyright notice and this permission notice shall be included in 
+  The above copyright notice and this permission notice shall be included in
   all copies or substantial portions of the Software.
 
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
   DEALINGS IN THE SOFTWARE.
 
   Fabien Bavent           fabien.bavent@gmail.com
@@ -26,7 +26,7 @@
 "use strict";
 
 var jDx = (function () {
-  
+
   var jDx = {};
 
   var i18n = {}, dF = {};
@@ -50,13 +50,13 @@ var jDx = (function () {
     },
     dayNames: [
       "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
-      "Sunday", "Monday", "Tuesday", "Wednesday", 
+      "Sunday", "Monday", "Tuesday", "Wednesday",
       "Thursday", "Friday", "Saturday"
     ],
     monthNames: [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-      "January", "February", "March", "April", "May", "June", 
+      "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ]
   };
@@ -80,14 +80,14 @@ var jDx = (function () {
     },
     dayNames: [
       "Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam",
-      "Dimanche", "Lundi", "Mardi", "Mercredi", 
+      "Dimanche", "Lundi", "Mardi", "Mercredi",
       "Jeudi", "Vendredi", "Samedi"
     ],
     monthNames: [
       "Jan", "Feb", "Mar", "Avr", "Mai", "Jun",
       "Jul", "Aou", "Sep", "Oct", "Nov", "Dec",
-      "Janvier", "Fevrier", "Mars", "Avril", 
-      "Mai", "Juin", "Juillet", "Aout", 
+      "Janvier", "Fevrier", "Mars", "Avril",
+      "Mai", "Juin", "Juillet", "Aout",
       "Septembre", "Octobre", "Novembre", "Decembre"
     ]
   };
@@ -111,14 +111,14 @@ var jDx = (function () {
     },
     dayNames: [
       "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab",
-      "Domingo", "Lunes", "Martes", "Miercoles", 
+      "Domingo", "Lunes", "Martes", "Miercoles",
       "Jueves", "Viernes", "Sabado"
     ],
     monthNames: [
-      "I", "II", "III", "IV", "V", "VI", 
+      "I", "II", "III", "IV", "V", "VI",
       "VII", "VIII", "IX", "X", "XI", "XII",
-      "enero", "febrero", "marzo", "abril", 
-      "mayo", "junio", "julio", "augusto", 
+      "enero", "febrero", "marzo", "abril",
+      "mayo", "junio", "julio", "augusto",
       "septiembre", "octubre", "noviembre", "decembre"
     ]
   };
@@ -204,7 +204,7 @@ var jDx = (function () {
 
   /** Create the parsing model for this date mask. */
   var createDateParsingModel = function (mask) {   
-    var model = {}, 
+    var model = {},
         idx = 0;
 
     if (mask.slice(0, 4) === "UTC:") {
@@ -243,7 +243,7 @@ var jDx = (function () {
 
   /** Set date-time from text. */
   var dateParsingSetter = {
-    setHours: function (date, model, matching, config) { 
+    setHours: function (date, model, matching, config) {
       if (model.hours) {
         var dc = 0;
         if (model.TT && matching[model.TT].toUpperCase() === 'PM') {
@@ -318,17 +318,17 @@ var jDx = (function () {
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  /** Format a date to string */ 
-  jDx.formatDate = function (date, mask, utc) {
-    if (arguments.length === 1 && typeof(date) === 'string') {
+  /** Format a date to string */
+  jDx.formatDate = function (pdate, mask, utc) {
+    if (arguments.length === 1 && typeof(pdate) === 'string') {
       mask = date;
-      date = undefined;
+      pdate = undefined;
     }
 
     mask = dF.masks[mask] || mask || dF.masks["default"];
-    date = date ? new Date(date) : new Date();
+    var date = pdate ? new Date(pdate) : new Date();
     if (isNaN(date)) {
-      throw SyntaxError("invalid date: '" + date + "'");
+      throw SyntaxError("invalid date: '" + pdate + "'");
     } else if (mask.slice(0, 4) === "UTC:") {
       mask = mask.slice(4);
       utc = true;

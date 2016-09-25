@@ -4,6 +4,10 @@
 *
 !*/
 
+# Remove building folders
+[Bb]in/
+[Cc]overage/
+
 # Add source file
 !*.js
 !*.json

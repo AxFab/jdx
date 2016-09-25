@@ -67,6 +67,10 @@ var doTest = function (date, test, assert) {
 
   res = jDx.formatDate(date, test);
   org = info.md ? jDx.parseDate(res, test) : jDx.parseDate(res);
+  if (isNaN(org)) {
+    console.warn("Can't parse :'" + res + "', retry...");
+    org = jDx.parseDate(res, test);
+  }
   exd = jDx.formatDate(org, 'isoUtcDateTime');
   a = !isNaN(org) ? parseInt(org.getTime() / info.prc) : 0;
   if (info.mod) {

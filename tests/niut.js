@@ -49,7 +49,7 @@ var niut = (function () {
     Assert.prototype.display = function(prefix) {
       prefix = prefix || '';
       var msgs = this.__statistics().messages;
-      for (var i=0; i < msgs.length; ++i) {
+      for (var i = 0; i < msgs.length; ++i) {
         console.warn(prefix + msgs[i]);
       }
     };
@@ -65,7 +65,7 @@ var niut = (function () {
     }
 
     Assert.prototype.isTrue = function(expr, msg) {
-      msg = msg || 'Expects true, got "'+expr+'".';
+      msg = msg || 'Expects true, got "' + expr + '".';
       this.__statistics().testCount++;
       if (!expr) {
         this.fails(msg);
@@ -73,22 +73,22 @@ var niut = (function () {
     };
 
     Assert.prototype.isFalse = function(expr, msg) {
-      msg = msg || 'Expects false, got "'+expr+'".';
+      msg = msg || 'Expects false, got "' + expr + '".';
       this.isTrue(!expr, msg);
     };
 
     Assert.prototype.isEquals = function(a, b, msg) {
-      msg = msg || 'Expects "'+a+'" === "'+b+'".';
+      msg = msg || 'Expects "' + a + '" === "' + b + '".';
       this.isTrue(a === b, msg);
     };
 
     Assert.prototype.isNull = function(obj, msg) {
-      msg = msg || 'Expects null, got "'+obj+'".';
+      msg = msg || 'Expects null, got "' + obj + '".';
       this.isTrue(obj === null, msg);
     };
 
     Assert.prototype.isNotNull = function(obj, msg) {
-      msg = msg || 'Expects not null, got "'+obj+'".';
+      msg = msg || 'Expects not null, got "' + obj + '".';
       this.isTrue(obj !== null && obj !== undefined, msg);
     };
 
@@ -121,7 +121,7 @@ var niut = (function () {
     };
 
 
-    TestSuite.prototype.startTest = function (name, method, callback) 
+    TestSuite.prototype.startTest = function (name, method, callback)
     {
       var handled = false;
       var assert = new Assert(name);

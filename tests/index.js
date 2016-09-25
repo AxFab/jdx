@@ -26,9 +26,9 @@ var DateWithTime = function (time) {
 
 var dates = [
   new Date(),
-  DateWithTime(1),
-  new Date(2012, 09, 12, 12, 12, 12), // Some error linked to summer/winter time.
-  new Date(1815, 06, 18, 12, 30, 02),
+  // DateWithTime(1),
+  // new Date(2012, 09, 12, 12, 12, 12), // Some error linked to summer/winter time.
+  // new Date(1815, 06, 18, 12, 30, 02),
 ];
 
 

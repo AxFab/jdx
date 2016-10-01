@@ -1,6 +1,6 @@
 
 var jDx = jDx || require('../jdx.js'),
-    niut = niut || require ('./niut.js'),
+    niut = niut || require ('niut'),
     suite = niut.newSuite('Validator');
 
 var timezones = [ 'locale' ];

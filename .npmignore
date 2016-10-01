@@ -1,5 +1,5 @@
 # =======================================================
-# GitIgnore '.gitignore' for JS code
+# NpmIgnore '.npmignore' for JS code
 #     Fabien B. <fabien.bavent@gmail.com>
 #
 # This program is distributed in the hope that it will be useful,
@@ -23,6 +23,4 @@
 # Add repository files
 !*.md
 !.git*
-!.npm*
-!.travis.yml
 ![A-Z]*

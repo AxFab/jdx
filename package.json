@@ -20,9 +20,9 @@
     "parse"
   ],
   "devDependencies": {
-    "istanbul": "0.4.*",
-    "coveralls": "2.11.*",
-    "uglify-js": "2.7.*"
+    "istanbul": "^0.4.0",
+    "coveralls": "^2.11.0",
+    "uglify-js": "^2.7.0"
   },
   "author": "Fabien Bavent <fabien.bavent@gmail.com>",
   "license": "MIT",

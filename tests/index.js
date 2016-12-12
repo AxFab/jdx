@@ -1,7 +1,8 @@
 
 var jDx = jDx || require('../jdx.js'),
-    niut = niut || require ('./niut.js'),
-    suite = niut.newSuite('Validator');
+    niut = niut || require ('niut');
+
+var langs = ['en', 'fr', 'es'];
 
 var timezones = [ 'locale' ];
 if (process.env.TZ) {
@@ -16,16 +17,16 @@ if (process.env.TZ) {
   ];
 }
 
-var langs = ['en', 'fr', 'es'];
 
 var DateWithTime = function (time) {
   var dt = new Date();
   dt.setTime(time);
   return dt;
-}
+};
 
 var dates = [
   new Date(),
+  // new Date(1815, 06, 18, 12, 30, 02)
   // DateWithTime(1),
   // new Date(2012, 09, 12, 12, 12, 12), // Some error linked to summer/winter time.
   // new Date(1815, 06, 18, 12, 30, 02),
@@ -49,6 +50,8 @@ var formatTests = {
   'isoUtcDateTime':true,
   'HH:MM Z':{prc:1000*60,mod:60*24,md:true},
 };
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 var verbose = process.env.JDX_VERBOSE;
 
@@ -82,42 +85,69 @@ var doTest = function (date, test, assert) {
     if (verbose) console.log (' - ' + test + ': ' + res + ' -> FAIL ('+ exd+')');
     assert.fails('Expected "' + res + '", got: "' + exd + '".');
   }
-  // $('#test_format').append(UT.toHtml(test, status, res, exd));
+
+  if (typeof $ !== 'undefined')
+    $('#test_format').append(UT.toHtml(test, status, res, exd));
+};
+
+// Create a new test case
+var addTestCase = function (date, test, tz, lang) {
+  return function (assert, done) {
+    process.env.TZ = tz;
+    jDx.setLang(lang);
+    if (verbose)
+      console.log (tz, new Date().getTimezoneOffset());
+    doTest(date, test, assert);
+    done();
+  }
+};
+
+// Create a new test suites
+var addTestSuites = function (lg, tz) {
+  var name = 'lg='+lg+', tz='+tz;
+  var suite = niut.newSuite(name);
+
+  for (var format in formatTests) {
+    for (var d in dates) {
+      var test = addTestCase(dates[d], format, tz, lg);
+      suite.test(format + ', ' + name, test);
+    }
+  }
+  return suite;
 };
 
 var testSuite = function (date, tz, lang) {
   return function (assert, done) {
-    process.env.TZ = tz;
+    // process.env.TZ = tz;
     if (verbose) console.log (tz, new Date().getTimezoneOffset());
     jDx.setLang(lang);
     for (var test in formatTests) {
+
       doTest(date, test, assert);
     }
     done();
   };
-}
+};
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-suite.test('# UTC / GMT+0 issue', function (assert, done) {
+var suites = [];
 
+var suitePastIssue = niut.newSuite('Past issues');
+suites.push(suitePastIssue);
+suitePastIssue.test('# UTC / GMT+0', function (assert, done) {
   var date = jDx.parseDate('3:41:06 PM GMT+0000');
   assert.isFalse(isNaN(date));
-
   done();
 });
 
-for (var t in timezones) {
-  for (var d in dates) {
-    for (var l in langs) {
-      var lang = langs[l];
-      var tz = timezones[t];
-      var dt = dates[d]
-      suite.test('#'+jDx.formatDate(dt) + ', lg='+lang+', tz='+tz, testSuite(dt, tz, lang));
-    }
+
+for (var l in langs) {
+  for (var t in timezones) {
+    suites.push(addTestSuites(langs[l], timezones[t]));
   }
 }
 
-
-niut.runner([suite], function(echec) {
-  if (echec) throw new Error('CheckMate...');
+niut.runner(suites, function(echec) {
+  if (echec) process.exitCode = -1;
 });

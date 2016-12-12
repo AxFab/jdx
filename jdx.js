@@ -126,7 +126,7 @@ var jDx = (function () {
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   var datePartToken = 
-    /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g;
+    /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloOSZ]|"[^"]*"|'[^']*'/g;
 
   var datePartPatterns = {
     d:    { r:'[1-3]?[0-9]', t:'day'},
@@ -155,6 +155,7 @@ var jDx = (function () {
     TT:   { r:'[AP]M', t:'TT'},
     Z:    { r:'UTC|GMT[+-][0-9]{4}', t:'gmt'},
     o:    { r:'[+-][0-9]+', t:'gmt'},
+    O:    { r:'[+-][0-9]{2}:[0-9]{2}', t:'gmt'},
     S:    { r:'th|st|nd|rd'}
   };
 
@@ -198,6 +199,7 @@ var jDx = (function () {
       TT:   H < 12 ? "AM" : "PM",
       Z:    utc ? "UTC" : gmt,
       o:    (o > 0 ? "-" : "+") + padWithZero(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+      O:    (o > 0 ? "-" : "+") + padWithZero(Math.floor(Math.abs(o) / 60)) + padWithZero(Math.floor(Math.abs(o) % 60)),
       S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 !== 10) * d % 10]
     };
   };
@@ -385,6 +387,9 @@ var jDx = (function () {
       if (gmtStr == 'UTC') {
         config.gmHour = 0;
         config.gmMin = 0;
+      } else if (gmtStr.indexOf(':') == 3) {
+        config.gmHour = parseInt(gmtStr.substr(0, 3));
+        config.gmMin = parseInt(gmtStr.substr(0, 1) + gmtStr.substr(4));
       } else {
         config.gmHour = parseInt(gmtStr.substr(3, 3));
         config.gmMin = parseInt(gmtStr.substr(3, 1) + gmtStr.substr(6));

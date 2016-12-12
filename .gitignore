@@ -7,6 +7,7 @@
 # Remove building folders
 [Bb]in/
 [Cc]overage/
+[Nn]ode_[Mm]odules/
 
 # Add source file
 !*.js

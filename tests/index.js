@@ -5,9 +5,8 @@ var jDx = jDx || require('../jdx.js'),
 var langs = ['en', 'fr', 'es'];
 
 var timezones = [ 'locale' ];
-if (process.env.TZ) {
+if (false && typeof process !== 'undefined') {
   timezones = [
-    process.env.TZ,
     'Africa/Abidjan',
     'Europe/Amsterdam',
     'Europe/Paris',
@@ -27,7 +26,7 @@ var DateWithTime = function (time) {
 var dates = [
   new Date(),
   // new Date(1815, 06, 18, 12, 30, 02)
-  // DateWithTime(1),
+  // DateWithTime(1000 * 3600 * 24 * 365 * 24 + 1000 * 3600 * 24 * 366 * 6 + 1000 * 3600 * 24 * 1),
   // new Date(2012, 09, 12, 12, 12, 12), // Some error linked to summer/winter time.
   // new Date(1815, 06, 18, 12, 30, 02),
 ];
@@ -35,69 +34,82 @@ var dates = [
 
 /* List basic tests */
 var formatTests = {
-  'default':true,
-  'shortDate':{prc:1000*3600*24},
-  'sortableDate':{prc:1000*3600*24},
-  'mediumDate':{prc:1000*3600*24},
-  'longDate':{prc:1000*3600*24},
-  'fullDate':{prc:1000*3600*24},
-  'shortTime':{prc:1000*60,mod:60*24},
-  'mediumTime':{prc:1000,mod:3600*24},
-  'longTime':{prc:1000,mod:3600*24},
-  'isoDate':{prc:1000*3600*24},
-  'isoTime':true,
-  'isoDateTime':true,
-  'isoUtcDateTime':true,
-  'HH:MM Z':{prc:1000*60,mod:60*24,md:true},
+  'default':{ div:'S' },
+  'shortDate':{ div:'d'},
+  'sortableDate':{ div:'d'},
+  'mediumDate':{ div:'d'},
+  'longDate':{ div:'d'},
+  'fullDate':{ div:'d'},
+  'shortTime':{ div:'M', max:'d'},
+  'mediumTime':{ div:'S', max:'d'},
+  'longTime':{ div:'S', max:'d'},
+  'isoDate':{ div:'d'},
+  'isoTime':{ div:'S', max:'d'},
+  'isoDateTime':{ div:'S'},
+  'isoUtcDateTime':{ div:'S'},
+  'HH:MM Z':{ md:true, div:'M', max:'d'},
 };
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-var verbose = process.env.JDX_VERBOSE;
+var verbose = typeof process !== 'undefined' && process.env.JDX_VERBOSE;
 
-var doTest = function (date, test, assert) {
-  var info = formatTests[test], status;
-  if (info === true) {
-    info = {
-      prc:1000
-    };
-  }
-  var res, org, exd, a, 
-      b = parseInt(date.getTime() / info.prc);
-  if (info.mod) {
-    b = b % info.mod;
-  }
+// Return number of ticks
+var __ticks = function (dt, info) {
+  if (isNaN(dt))
+    return -1;
+  var divisions = { S:1000, M:1000*60, H:1000*3600, d:1000*3600*24 };
+  var tk = dt.getTime();
+  tk = parseInt(tk / divisions[info.div]) 
+  if (info.max)
+    tk = parseInt((tk % divisions[info.max]) / divisions[info.div]);
+  return tk;
+};
 
-  res = jDx.formatDate(date, test);
-  org = info.md ? jDx.parseDate(res, test) : jDx.parseDate(res);
-  if (isNaN(org)) {
-    console.warn("Can't parse :'" + res + "', retry...");
-    org = jDx.parseDate(res, test);
-  }
-  exd = jDx.formatDate(org, 'isoUtcDateTime');
-  a = !isNaN(org) ? parseInt(org.getTime() / info.prc) : 0;
-  if (info.mod) {
-    a = a % info.mod;
-  }
-  if (a === b) {
-    if (verbose) console.log (' - ' + test + ': ' + res + ' -> OK');
-  } else {
-    if (verbose) console.log (' - ' + test + ': ' + res + ' -> FAIL ('+ exd+')');
-    assert.fails('Expected "' + res + '", got: "' + exd + '".');
-  }
 
-  if (typeof $ !== 'undefined')
-    $('#test_format').append(UT.toHtml(test, status, res, exd));
+var doTest = function (name, date, test, assert) {
+  try {
+    var info = formatTests[test], status;
+
+    var expectedTicks = __ticks(date, info),
+        formatedDate = jDx.formatDate(date, test),
+        parsedDate = info.md ? jDx.parseDate(formatedDate, test) : jDx.parseDate(formatedDate);
+    if (isNaN(parsedDate)) {
+      console.warn("Can't parse :'" + formatedDate + "', retry...");
+      parsedDate = jDx.parseDate(formatedDate, test);
+    }
+    var parsedTicks = __ticks(parsedDate, info);
+    var parsedIso = jDx.formatDate(parsedDate, 'isoUtcDateTime');
+
+    if (parsedTicks === expectedTicks) {
+      if (verbose) console.log (' - ' + test + ': ' + formatedDate + ' -> OK');
+      status = 'success';
+    } else {
+      if (verbose) console.log (' - ' + test + ': ' + formatedDate + ' -> FAIL ('+ parsedIso+')');
+      assert.fails('Expected "' + formatedDate + '", got: "' + parsedIso + '".');
+      status = 'warning';
+    }
+
+    var s = {parsed:parsedTicks, expected:expectedTicks };
+    if (typeof $ !== 'undefined')
+      $('#test_format').append(UT.toHtml(name, status, formatedDate, parsedIso, JSON.stringify(s)));
+  } catch (ex) {
+    status = 'danger';
+    if (typeof $ !== 'undefined')
+      $('#test_format').append(UT.toHtml(name, status, formatedDate, parsedIso, JSON.stringify(ex)));
+    throw ex
+  }
 };
 
 // Create a new test case
-var addTestCase = function (date, test, tz, lang) {
+var addTestCase = function (name, date, test, tz, lang) {
   return function (assert, done) {
-    process.env.TZ = tz;
+    if (typeof process !== 'undefined')
+      process.env.TZ = tz;
     jDx.setLang(lang);
     if (verbose)
       console.log (tz, new Date().getTimezoneOffset());
-    doTest(date, test, assert);
+    doTest(name, date, test, assert);
     done();
   }
 };
@@ -109,25 +121,13 @@ var addTestSuites = function (lg, tz) {
 
   for (var format in formatTests) {
     for (var d in dates) {
-      var test = addTestCase(dates[d], format, tz, lg);
+      var test = addTestCase(format + ', ' + name, dates[d], format, tz, lg);
       suite.test(format + ', ' + name, test);
     }
   }
   return suite;
 };
 
-var testSuite = function (date, tz, lang) {
-  return function (assert, done) {
-    // process.env.TZ = tz;
-    if (verbose) console.log (tz, new Date().getTimezoneOffset());
-    jDx.setLang(lang);
-    for (var test in formatTests) {
-
-      doTest(date, test, assert);
-    }
-    done();
-  };
-};
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -149,5 +149,5 @@ for (var l in langs) {
 }
 
 niut.runner(suites, function(echec) {
-  if (echec) process.exitCode = -1;
+  if (echec && typeof process !== 'undefined') process.exitCode = -1;
 });

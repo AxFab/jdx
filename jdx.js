@@ -282,12 +282,6 @@ var jDx = (function () {
     },
     setDate: function (date, model, matching, config) {
       if (model.month) {
-        var since = 0;
-        if (matching[model.year].length === 2) {
-          since = parseInt(config.year / 100) * 100;
-        }
-        date.setYear(parseInt(matching[model.year]) + since);
-      
         var mn = parseInt(matching[model.month]);
         if (isNaN(mn)) {
           var arr = dF.monthNames;
@@ -299,6 +293,12 @@ var jDx = (function () {
           mn = (mn + 1) % 12;
         }
         date.setMonth(mn-1);
+
+        var since = 0;
+        if (matching[model.year].length === 2) {
+          since = parseInt(config.year / 100) * 100;
+        }
+        date.setYear(parseInt(matching[model.year]) + since);
       }
 
       if (model.day) {

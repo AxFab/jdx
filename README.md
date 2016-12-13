@@ -93,6 +93,7 @@ The expression provide to those previous functions will recognize those patterns
   - `TT`: The _meridiem_ (_AM_ or _PM_)
   - `Z`: The local time offset (_UTC_ or _GMT+0000_)
   - `o`: The local time offset in minutes
+  - `O`: The local time offset in the form '+HHMM'
   - `S`: Day of the month suffix (_th_, _st_, _nd_ or _rd_).
 
 To include extra characters, put them into quote __''__.

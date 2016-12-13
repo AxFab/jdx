@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>jDx tests</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="page-header">jDx <small>tests</small></h1>
+          <div class="well" id="test_format">
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+    <script>
+var UT = {
+  toHtml: function (test, status, result, expected, info) {
+    var html = '<div class="alert alert-'+ status+'"><b>'+test + '</b><br/> '+ result+' <span class="pull-right">'+ expected+'</span>';
+    if (info)
+      html += '<br/><em>'+info+'</em>';
+    html += '</div>';
+    return html;
+  }
+};
+    </script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="./jdx.js"></script>
+    <script src="./node_modules/niut/niut.js"></script>
+    <script src="./tests/index.js"></script>
+  </body>
+</html>

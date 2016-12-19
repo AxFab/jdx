@@ -2,6 +2,9 @@
 var jDx = jDx || require('../jdx.js'),
     niut = niut || require ('niut');
 
+if (!jDx.setLang('fr'))
+  require('../jdx-locales.min.js');
+
 var langs = ['en', 'fr', 'es'];
 
 var timezones = [ 'locale' ];

@@ -29,7 +29,7 @@ var jDx = (function () {
 
   var jDx = {};
 
-  var i18n = {}, dF = {};
+  var i18n = {}, locale = {};
 
   /** English - en */
   i18n.en = {
@@ -58,68 +58,6 @@ var jDx = (function () {
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
-    ]
-  };
-
-  /** French - fr */
-  i18n.fr = {
-    masks:{
-      "default":      "ddd dd mmm yyyy HH:MM:ss",
-      shortDate:      "d/m/yy",
-      sortableDate:   "yyyy/mm/dd",
-      mediumDate:     "d mmm yyyy",
-      longDate:       "d mmmm yyyy",
-      fullDate:       "dddd d mmmm yyyy",
-      shortTime:      "H:MM",
-      mediumTime:     "H:MM:ss",
-      longTime:       "H:MM:ss Z",
-      isoDate:        "yyyy-mm-dd",
-      isoTime:        "HH:MM:ss",
-      isoDateTime:    "yyyy-mm-dd'T'HH:MM:ss",
-      isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
-    },
-    dayNames: [
-      "Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam",
-      "Dimanche", "Lundi", "Mardi", "Mercredi",
-      "Jeudi", "Vendredi", "Samedi"
-    ],
-    monthNames: [
-      "Jan", "Feb", "Mar", "Avr", "Mai", "Jun",
-      "Jul", "Aou", "Sep", "Oct", "Nov", "Dec",
-      "Janvier", "Fevrier", "Mars", "Avril",
-      "Mai", "Juin", "Juillet", "Aout",
-      "Septembre", "Octobre", "Novembre", "Decembre"
-    ]
-  };
-
-  /** Spanish - es */
-  i18n.es = {
-    masks:{
-      "default":      "ddd dd-mmm-yyyy HH:MM:ss",
-      shortDate:      "d/m/yy",
-      sortableDate:   "yyyy/mm/dd",
-      mediumDate:     "d-mmm-yyyy",
-      longDate:       "d 'de' mmmm 'de' yyyy",
-      fullDate:       "dddd d 'de' mmmm 'de' yyyy",
-      shortTime:      "H:MM",
-      mediumTime:     "H:MM:ss",
-      longTime:       "H:MM:ss Z",
-      isoDate:        "yyyy-mm-dd",
-      isoTime:        "HH:MM:ss",
-      isoDateTime:    "yyyy-mm-dd'T'HH:MM:ss",
-      isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
-    },
-    dayNames: [
-      "Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab",
-      "Domingo", "Lunes", "Martes", "Miercoles",
-      "Jueves", "Viernes", "Sabado"
-    ],
-    monthNames: [
-      "I", "II", "III", "IV", "V", "VI",
-      "VII", "VIII", "IX", "X", "XI", "XII",
-      "enero", "febrero", "marzo", "abril",
-      "mayo", "junio", "julio", "augusto",
-      "septiembre", "octubre", "noviembre", "decembre"
     ]
   };
 
@@ -175,12 +113,12 @@ var jDx = (function () {
     return {
       d:    d,
       dd:   padWithZero(d),
-      ddd:  dF.dayNames[D],
-      dddd: dF.dayNames[D + 7],
+      ddd:  locale.dayNames[D],
+      dddd: locale.dayNames[D + 7],
       m:    m + 1,
       mm:   padWithZero(m + 1),
-      mmm:  dF.monthNames[m],
-      mmmm: dF.monthNames[m + 12],
+      mmm:  locale.monthNames[m],
+      mmmm: locale.monthNames[m + 12],
       yy:   y.toString().slice(2),
       yyyy: y,
       h:    H % 12 || 12,
@@ -284,7 +222,7 @@ var jDx = (function () {
       if (model.month) {
         var mn = parseInt(matching[model.month]);
         if (isNaN(mn)) {
-          var arr = dF.monthNames;
+          var arr = locale.monthNames;
           for (mn = 0; mn< arr.length; ++mn) {
             if (matching[model.month] === arr[mn]) {
               break;
@@ -327,7 +265,7 @@ var jDx = (function () {
       pdate = undefined;
     }
 
-    mask = dF.masks[mask] || mask || dF.masks["default"];
+    mask = locale.masks[mask] || mask || locale.masks["default"];
     var date = pdate ? new Date(pdate) : new Date();
     if (isNaN(date)) {
       throw SyntaxError("invalid date: '" + pdate + "'");
@@ -353,14 +291,14 @@ var jDx = (function () {
         tzOff = -now.getTimezoneOffset(),
         matching;
 
-    var model = dF.models[mask] || mask;
+    var model = locale.models[mask] || mask;
     if (typeof model === 'string') {
       model = createDateParsingModel(mask);
-      dF.models[mask] = model;
+      locale.models[mask] = model;
       matching = model.reg.exec(date);
     } else if (!model) {
-      for (var k in dF.models) {
-        model = dF.models[k];
+      for (var k in locale.models) {
+        model = locale.models[k];
         matching = model.reg.exec(date);
         if (matching) {
           break;
@@ -402,14 +340,74 @@ var jDx = (function () {
     return res;
   };
 
-  /** Change of language and reset parsing model cache. */
-  jDx.setLang = function (lang) {
-    dF = i18n[lang] || i18n.en;
-    dF.models = {};
-    for (var k in dF.masks) {
-      dF.models[k] = createDateParsingModel(dF.masks[k]);
+  jDx.transform = function(date, input, output, utc) {
+    return jDx.formatDate(jDx.parseDate(date, input, utc), output, utc);
+  }
+
+  jDx.relative = function (date, from) {
+    var tbl = [
+      { presicion:1000, max:60, word:'seconds' },
+      { presicion:1000 * 60, max:2, word:'minute' },
+      { presicion:1000 * 60, max:60, word:'minutes' },
+      { presicion:1000 * 3600, max:2, word:'hour' },
+      { presicion:1000 * 3600, max:24, word:'hours' },
+      { presicion:1000 * 3600 * 24, max:2, word:'day' },
+      { presicion:1000 * 3600 * 24, max:30, word:'days' },
+      { presicion:1000 * 3600 * 24 * 30.4167, max:2, word:'month' },
+      { presicion:1000 * 3600 * 24 * 30.4167, max:12, word:'months' },
+      { presicion:1000 * 3600 * 365.4, max:2, word:'year' },
+      { presicion:1000 * 3600 * 365.4, max:99999, word:'years' },
+    ];
+    if (!from) {
+      from = new Date();
+    } else if (typeof from === 'string') {
+      from = jDx.parseDate(from);
     }
-    return jDx;
+    var ms = from.getTime() - date.getTime(),
+        str = ms < 0 ? locale.relative.future : locale.relative.past,
+        rel = null,
+        count = 1,
+        i = 0;
+    ms = Math.abs(ms);
+    while (ms < tbl[i].presicion * tbl[i].max) {
+      ++i;
+    }
+
+    rel = locale.relative[tbl[i].word];
+    count = parseInt(ms / tbl[i].presicion);
+
+    if (typeof rel === 'function')
+      rel = rel(count);
+    else 
+      rel = rel.replace('%d', count);
+    return str.replace('%s', rel);
+  };
+
+  /** Change of language and reset parsing model cache. */
+  jDx.addLang = function (lang, opt) {
+    i18n[lang] = opt;
+    if (!opt.masks || 
+        !opt.dayNames || opt.dayNames.length < 14 || 
+        !opt.monthNames || opt.monthNames.length < 24) {
+      throw new Error('Invalid locale data "'+lang+'".');
+    }
+    opt.masks.isoDate = "yyyy-mm-dd",
+    opt.masks.isoTime = "HH:MM:ss",
+    opt.masks.isoDateTime = "yyyy-mm-dd'T'HH:MM:ss",
+    opt.masks.isoUtcDateTime = "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+  }
+
+  /** Change of language and reset parsing model cache. */
+  jDx.setLang = function (lang, opt) {
+    if (opt) {
+      jDx.addLang(lang, opt);
+    }
+    locale = i18n[lang] || i18n.en;
+    locale.models = {};
+    for (var k in locale.masks) {
+      locale.models[k] = createDateParsingModel(locale.masks[k]);
+    }
+    return i18n[lang] ? jDx : null;
   };
 
   return jDx.setLang('en');
